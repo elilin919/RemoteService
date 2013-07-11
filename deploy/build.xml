@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     2008-5-16 下午07:58:58                                                        
+
+     wcms    
+     builder
+                   
+     yunpenglin                                                                
+     ====================================================================== -->
+<project name="wcms" default="default" xmlns:artifact="urn:maven-artifact-ant">
+	<path id="maven-ant-tasks.classpath" path="./maven-ant-tasks-2.1.3.jar" />  
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"  
+	           uri="urn:maven-artifact-ant"  
+	           classpathref="maven-ant-tasks.classpath" /> 
+	<artifact:pom file="../pom.xml" id="pom_conf" />
+		
+	<artifact:dependencies pathId="dependency.classpath"  filesetId="dependency.fileset" usescope="runtime">
+		 <pom refid="pom_conf" />  
+	</artifact:dependencies>
+		
+	<path id="classpath">
+		 <fileset dir="../lib" includes="*.jar"/>
+		 <fileset dir="../target" includes="*.jar"/>
+		 <fileset refid="dependency.fileset" />  
+	</path>
+		
+	<!-- ================================= 
+          target: defult              
+         ================================= -->
+    <target name="default" description="default">
+
+    	<antcall target="buildmodule" >
+	        <param name="module-name" value="test-service"/>
+	        <param name="src-dir" value="src/test/java"/>
+	        <param name="client-exclude" 
+	            value="**/TestServiceImpl.class"/>
+    	</antcall>
+    	<!-- server files -->
+		<copy todir="run_test/server" flatten="true" overwrite="false">
+			<fileset refid="dependency.fileset" />  
+			<fileset dir="../target" includes="*.jar"/>
+			<fileset dir="../lib" includes="*.jar"/>
+		</copy>
+    	<mkdir dir="run_test/server/ext" />
+    	<copy todir="run_test/server/ext" flatten="true" overwrite="true">
+    	    <fileset dir="./modules" includes="*.jar"/>
+    	</copy>
+    	<mkdir dir="run_test/server/config" />
+    	<copy todir="run_test/server/config" flatten="true" overwrite="false">
+    	   	<fileset dir="../src/main/resources" includes="**/*.*"/>
+    	</copy>
+    	<!-- client files -->
+    	<copy todir="run_test/client" flatten="true" overwrite="false">
+    		<fileset refid="dependency.fileset" />
+    		<fileset dir="../target" includes="*.jar"/>
+    		<fileset dir="../lib" includes="*.jar"/>
+    		<fileset dir="modules-client" includes="*.jar"/>
+    	</copy>
+       	<mkdir dir="run_test/client/config" />
+        <copy todir="run_test/client/config" flatten="true" overwrite="false">
+           	<fileset dir="../src/test/resources" includes="**/*.*"/>
+        </copy>
+    </target>
+	
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: depends                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="buildmodule">
+    	<tstamp id="build-datetime" >
+    		<format pattern="_yyMMdd_hhmm"   property="buildDate"/>
+    	</tstamp>
+    	<mkdir dir="modules/${module-name}" />
+    	<javac destdir="modules/${module-name}" 
+     		debug="true" 
+    		srcdir="../${src-dir}" 
+    		classpathref="classpath" 
+    		deprecation="on" 
+    		encoding="UTF-8" source="7" target="7"
+    		/>
+    	<copy todir="modules/${module-name}">
+    		<fileset dir="../${src-dir}">
+    			<exclude name="**/*.java" />
+    		</fileset>
+    	</copy>
+    	<jar destfile="modules/${module-name}-server.jar" basedir="modules/${module-name}" />
+    	<echo message="exclude:${client-exclude}"/>
+    	<jar excludes="${client-exclude}" 
+    		destfile="modules-client/${module-name}-client.jar" basedir="modules/${module-name}" />
+
+    	<delete dir="modules/${module-name}"></delete>
+    </target>
+    
+</project>

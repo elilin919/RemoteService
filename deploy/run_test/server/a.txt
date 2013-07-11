@@ -1,0 +1,13 @@
+ 驱动器 F 中的卷是 Documents
+ 卷的序列号是 DC30-A87E
+
+ F:\workspaces\eclipse-java\remote-service-framework\deploy\run_test\server 的目录
+
+activation-1.1.jar              cglib-nodep-2.2.2.jar
+commons-collections-3.2.1.jar   commons-logging-1.0.4.jar
+commons-pool-1.6.jar            jms-1.1.jar
+jmxri-1.2.1.jar                 jmxtools-1.2.1.jar
+log4j-1.2.15.jar                mail-1.4.jar
+remote-service-1.0.0.jar        spymemcached-2.8.0.jar
+              12 个文件      2,458,380 字节
+               0 个目录 47,204,487,168 可用字节
